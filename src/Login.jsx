@@ -15,8 +15,9 @@ export default function Login() {
         username,
         password,
       });
-      const { accessToken, refreshToken } = response.data;
-      localStorage.setItem("accessToken", accessToken);
+      console.log(response.data, "++++++++++++++++++++++++++++++++++++++++++++++++")
+      const { token, refreshToken } = response.data;
+      localStorage.setItem("accessToken", token);
       localStorage.setItem("refreshToken", refreshToken);
       navigate("/home");
     } catch (err) {
