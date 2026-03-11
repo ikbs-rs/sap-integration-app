@@ -1,25 +1,42 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 
 export default function Home() {
   const [response, setResponse] = useState("");
+  const navigate = useNavigate();
 
   const callApi = async (endpoint) => {
     try {
       const token = localStorage.getItem("accessToken");
-      const url = `http://localhost:8801/sap/${endpoint}`
-
-      console.log(url, "++++++++++++++++++++++++++++++++++++++++++++++")
-      const res = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const url = `http://localhost:8801/sap/${endpoint}`;
+      console.log(url, "22222222222222222222222222222222222222222222", token);
+      let res = {}
+      if (endpoint == "zhr2001") {
+        res = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        res = await axios.post(url, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });        
+      }
       setResponse(JSON.stringify(res.data, null, 2));
     } catch (err) {
-      setResponse("Error: " + err.message);
+      console.log("Greška:", err);
+      if (err.response?.status === 401) {
+        localStorage.clear(); // 🧹 očisti token
+        navigate("/"); // 🔀 preusmeri na login
+      } else {
+        const message = err.response?.data?.message || err.message;
+        setResponse("Error: " + message);
+      }
     }
   };
 
